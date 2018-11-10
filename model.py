@@ -78,6 +78,7 @@ class res34_v0:
         loss = sess.run([self.loss], feed_dict={self.input: image, self.target: target})
         return loss
 
+
 def stacked_res_blocks(inputs, kernel_size, filters, count, is_training, bottleneck_filters=None, type="resblock"):
     if count < 1:
         raise ValueError("The number of stacked residual blocks should be positive")
