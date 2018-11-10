@@ -8,7 +8,7 @@ import numpy as np
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
-datadir = "raw_data/dress"
+datadir = "raw_data/top"
 
 def main():
     file_list = os.listdir(datadir)
@@ -19,10 +19,11 @@ def main():
     df = pd.DataFrame(columns=feature_list)
 
     for file_name in file_list:
-        label = re.search(r'(.*)[0-9]+.json', file_name).group(1)
+        label = re.search(r'([a-zA-Z]*)[0-9]+.json', file_name).group(1)
         df_slice = pd.DataFrame(columns=feature_list)
 
         json_file = open(os.path.join(datadir, file_name)).read()
+        print(file_name)
         data = json.loads(json_file)["results"]
         product_id = [d["custom_data"]["ProductID"] for d in data]
         df_slice["ID"] = product_id
@@ -37,8 +38,14 @@ def main():
             df["%s" % feature] = df["%s" % feature] > 0
     df = df.astype(int)
 
-    df.to_csv("dress.csv")
+    df.to_csv("top.csv")
 
+def join():
+    dress_df = pd.read_csv("parsed_data/dress.csv")
+    top_df = pd.read_csv("parsed_data/top.csv")
+
+    combined = pd.concat([dress_df, top_df]).fillna(0).astype(int).set_index("ID")
+    combined.to_csv("parsed_data/combined.csv")
 
 if __name__ == "__main__":
-    main()
+    join()
