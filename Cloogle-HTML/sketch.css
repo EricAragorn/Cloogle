@@ -1,0 +1,62 @@
+#sketch{
+    display: flex;
+    flex-direction: row;
+}
+#left-sleeve{
+    /*background-color: orange;*/
+    width: 100px;
+    height: 450px;
+    -webkit-backface-visibility: hidden;
+}
+#left-sleeve:hover{
+    border: solid 1px;
+/*    transform: rotateY(180deg);
+    transition: transform 0.6s;
+    transform-style: preserve-3d;*/
+    
+}
+#body{
+    /*background-color: blue;*/
+    width: 100px;
+    height: 500px;
+    display: flex;
+    flex-direction: column;
+}
+
+#neck{
+    /*background-color: grey;*/
+    width: 100px;
+    height: 100px;
+}
+#neck:hover{
+    border: solid 1px;
+}
+
+
+#waist{
+    /*background-color: pink;*/
+    width: 100px;
+    height:100px;
+}
+#waist:hover{
+    border: solid 1px;
+}
+
+#leg{
+    /*background-color: yellow;*/
+    width: 100px;
+    height: 300px;
+}
+#leg:hover{
+    border: solid 1px;   
+}
+
+#right-sleeve{
+    /*background-color: red;*/
+    transform: scaleX(-1);
+    width: 100px;
+    height: 450px;
+}
+#right-sleeve:hover{
+    border: solid 1px;
+}

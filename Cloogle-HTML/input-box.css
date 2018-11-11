@@ -1,0 +1,53 @@
+
+@keyframes fadeIn {
+  0% {opacity: 0;}
+  100% {opacity: 1;}
+}
+
+@keyframes fadeOut {
+  100% {opacity: 0;}
+  0% {opacity: 1;}
+}
+
+.fadeIn {
+  -webkit-animation-duration: 1s;animation-duration: 1s;
+  -webkit-animation-fill-mode: both;animation-fill-mode: both;
+  -webkit-animation-name: fadeIn;
+  animation-name: fadeIn;
+}
+.fadeOut {
+  -webkit-animation-duration: 1s;animation-duration: 1s;
+  -webkit-animation-fill-mode: both;animation-fill-mode: both;
+  -webkit-animation-name: fadeOut;
+  animation-name: fadeOut;
+}
+
+#input-box {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  opacity: 0;
+  width: 580px;
+  height: 50px;
+}
+
+div.gallery {
+    margin: 1px;
+    border: 1px solid #ccc;
+    width: 70px;
+    height: 70px;
+}
+
+div.gallery:hover {
+    border: 1px solid #777;
+}
+
+div.gallery img {
+    width: 100%;
+    height: auto;
+}
+
+div.desc {
+    padding: 15px;
+    text-align: center;
+}

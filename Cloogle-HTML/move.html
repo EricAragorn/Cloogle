@@ -1,0 +1,40 @@
+<div id="x" style="position: absolute; top: 5px; left: 15px;" >A</div>
+<div id="y" style="position: absolute; top: 200px; left: 250px;" >B</div>
+
+<script type="text/javascript">
+    function getPos(e){
+        return {
+            top: e.getBoundingClientRect().top + window.scrollY,
+            left: e.getBoundingClientRect().left + window.scrollX
+        };
+    }
+    function move(idx, idy){
+        var x = document.getElementById(idx);
+        var y = document.getElementById(idy);
+        var posX = getPos(x), posY = getPos(y);
+
+        var topDiff = posY.top - posX.top;
+        var interval = 100;
+        var vTop = topDiff/interval;
+
+        var temp = setInterval(animate, 5);
+        function animate(){
+            posX.top += vTop;
+            x.style.top = posX.top + 'px';
+            if (posX.top == posY.top){
+                clearInterval(temp);
+            }
+        }
+    }
+    move('x', 'y');
+    // var a = document.getElementById("x");
+    // var topPos = a.getBoundingClientRect().top + window.scrollY;
+    // var leftPos = a.getBoundingClientRect().left + window.scrollX;
+    // console.log(topPos);
+    // console.log(leftPos);
+    // var b = document.getElementById("y");
+    // topPos = b.getBoundingClientRect().top + window.scrollY;
+    // leftPos = b.getBoundingClientRect().left + window.scrollX;
+    // console.log(topPos);
+    // console.log(leftPos);
+</script>

@@ -1,0 +1,250 @@
+<link rel="stylesheet" type="text/css" href="Cloogle.css">
+<link rel="stylesheet" type="text/css" href="sketch.css">
+<link rel="stylesheet" type="text/css" href="input-box.css">
+
+<div id="header">
+  <div id="title">CLOGO</div>
+  <div id="subtitle">Transform your online experience</div>
+</div>
+<div id="main">
+  <form id="upload-image" enctype="multipart/form-data">
+  <label for="pic"><div id="upload"> <img id="preview" src="plus.png"> </div></label>
+  <input type="file" name="image" id="pic" style="display: none;" onchange="loadPic()">
+  </form>
+  <div id="sketch">
+      <img src="sketch-group/shortSleeve.svg" id="left-sleeve" onclick="showTags('sleeve')">
+      
+      <div id="body">
+          <!-- <div id="neck">b</div> -->
+          <img src="sketch-group/roundNeck.svg" id="neck" onclick="showTags('neck')">
+          <!-- <div id="waist">d</div> -->
+          <img src="sketch-group/waistPart.svg" id="waist" onclick="showTags('length')">
+          <!-- <div id="leg">e</div> -->
+          <img src="sketch-group/shortSkirt.svg" id="leg" onclick="showTags('length')">
+      </div>
+      <img src="sketch-group/shortSleeve.svg" id="right-sleeve" onclick="showTags('sleeve')">
+  </div>
+
+  <div id="input-box" class="fadeOut">
+  </div>
+</div>
+
+<script type="text/javascript">
+
+
+var attributes = {
+  "sleeve": "shortSleeve",
+  "sleeve_dirty": true,
+  "neck": "roundNeck",
+  "neck_dirty": true,
+  "length": "maxiLength",
+  "length_dirty": true
+};
+
+function changeAttributeDisplay(key, val){
+    alert("key: " + key + " val: " + val);
+    changeAttribute(key, val);
+    mapAttribute();
+}
+
+function changeAttribute(key, val){
+  if (attributes[key]==val) return;
+
+  attributes[key] = val;
+  attributes[key + "_dirty"] = true;
+}
+
+function mapAttribute(){
+  function disappear(e){
+    e.classList.remove("fadeIn") ;
+    e.classList.add("fadeOut");
+  }
+  function appear(e){
+    e.classList.remove("fadeOut");
+    e.classList.add("fadeIn");
+  }
+
+  var callbackSleeve = function(){},
+    callbackNeck = function(){},
+    callbackLength = function(){};
+
+  if (attributes.sleeve_dirty){
+    attributes.sleeve_dirty = false;
+    //for sleeve
+    disappear(document.getElementById("left-sleeve"));
+    disappear(document.getElementById("right-sleeve"));
+
+    callbackSleeve = function(){
+      document.getElementById("left-sleeve").src 
+      = "sketch-group/" + attributes.sleeve + ".svg";
+      document.getElementById("right-sleeve").src
+      = "sketch-group/" + attributes.sleeve + ".svg";
+      appear(document.getElementById("left-sleeve"));
+      appear(document.getElementById("right-sleeve"));
+    }
+    setTimeout(callbackSleeve, 1000);
+  }
+
+  //for neck
+  if (attributes.neck_dirty){
+    attributes.neck_dirty = false;
+    disappear(document.getElementById("neck"));
+    callbackNeck = function(){
+      document.getElementById("neck").src
+      = "sketch-group/" + attributes.neck + ".svg";    
+      appear(document.getElementById("neck"));
+    }
+    setTimeout(callbackNeck, 1000);
+  }
+
+  if (attributes.length_dirty){
+    attributes.length_dirty = false;
+    // for length
+    disappear(document.getElementById("leg"));
+    disappear(document.getElementById("waist"));
+    callbackLength = function(){
+      if (attributes.length == "cropLength" 
+        || attributes.length == "longLength"
+        || attributes.length == "midLength") { // this is a shirt
+        document.getElementById("leg").style.display = "none";
+        document.getElementById("waist").src
+        = "sketch-group/" + attributes.length + ".svg"; 
+      }else{ // this is a dress
+        document.getElementById("leg").style.display = "block";
+        document.getElementById("waist").src = "sketch-group/defaultWaist.svg";
+        document.getElementById("leg").src
+        = "sketch-group/" + attributes.length + ".svg"; 
+      }
+      appear(document.getElementById("leg"));
+      appear(document.getElementById("waist"));
+    }
+    setTimeout(callbackLength, 1000);
+  }
+
+}
+
+mapAttribute();
+
+// Testing Code
+// setTimeout(function(){
+//   changeAttribute("length", "cropLength");
+//   mapAttribute();  
+// }, 2500);
+
+// setTimeout(function(){
+//   changeAttribute("length", "shortLength");
+//   mapAttribute();  
+// }, 5000);
+
+
+var neckMetaTags = ['asymmetricNeck', 'bardotNeck', 'collarNeck', 'cowlNeck', 'halterNeck', 'jewelNeck', 'plungingNeck', 'roundNeck', 'splitNeck', 'squareNeck', 'surpliceNeck', 'sweetheartNeck', 'turtleNeck', 'vNeck'] ;
+var lengthMetaTags = ['asymmetricLength', 'cropLength', 'highlowLength', 'kneeLength', 'longLength', 'maxiLength', 'midiLength', 'midLength', 'shortLength'];
+var sleeveMetaTags = ['capSleeve', 'longSleeve', 'midSleeve', 'shortSleeve', 'sleeveless', 'spaghettistrapSleeve', 'straplessSleeve'];
+
+//preparing data
+var neckTags = {
+  'dir': 'neck',
+  'tags': neckMetaTags
+};
+
+var lengthTags = {
+  'dir': 'length',
+  'tags': lengthMetaTags
+};
+
+var sleeveTags = {
+  'dir': 'sleeve',
+  'tags': sleeveMetaTags
+};
+
+var tags = {
+  'neck': neckTags,
+  'length': lengthTags,
+  'sleeve': sleeveTags
+};
+
+var lastTag = null;
+
+function showTags(className){
+  var inputBox = document.getElementById("input-box");
+
+  if (lastTag!=null){ // fade out the last tag table
+    inputBox.classList.remove("fadeIn");
+    inputBox.classList.add("fadeOut");
+    //clear out the elements
+    setTimeout(function(){
+      while(inputBox.hasChildNodes()){
+        inputBox.removeChild(inputBox.firstChild);
+      }
+    }, 1000);
+
+  }
+  //add in new tags
+  setTimeout(function(){
+    var currTags = tags[className];
+    for (var i=0;i<currTags.tags.length;i++){
+      var g = document.createElement("div");
+      g.classList.add("gallery");
+      g.setAttribute("onclick", 
+        "changeAttributeDisplay('" +  currTags.dir + "','" + currTags.tags[i] +"')");
+      var a = document.createElement("a");
+      a.target = "_blank";
+      var img = document.createElement("img");
+      img.src= currTags.dir + "/" + currTags.tags[i] + ".png";
+      a.appendChild(img);
+      g.appendChild(a);
+      inputBox.appendChild(g);
+    }
+  }, 1000)
+
+  //fade in
+  setTimeout(function(){
+    inputBox.classList.remove("fadeOut");
+    inputBox.classList.add("fadeIn");
+    lastTag = className;    
+  }, 1000);
+}
+
+function loadPic(){
+  //load preview image
+  var pic = document.getElementById("pic");
+  var FR= new FileReader();
+  FR.onload = function(e) {
+    console.log(e);
+    var img = document.getElementById("preview");
+    img.src = e.target.result;
+    console.log(e.target.result);
+  };       
+  FR.readAsDataURL( pic.files[0] );
+ //upload image
+  var xhr = new XMLHttpRequest();
+  xhr.open('POST', 'http://localhost:3000/', true);
+  xhr.onload = function () {
+    if (xhr.status === 200) {
+      alert("Uploaded");
+    } else {
+      alert('An error occurred!');
+    }
+  };
+  xhr.onreadystatechange = function() {
+    if (xhr.readyState === 4) {
+      alert("Receive Feedback");
+      console.log(xhr.response);
+      // setToResponse(JSON.parse(xhr.response));
+    }
+  }
+  var oData = new FormData(document.getElementById("upload-image"));
+  console.log(oData);
+  xhr.send(oData);
+}
+
+function setToResponse(dic){
+  setAttribute("length", dic.Length);
+  setAttribute("neck", dic.Neck);
+  setAttribute("sleeve", dic.SleeveLength);
+  mapAttribute();
+}
+
+showTags('neck');
+
+</script>
