@@ -9,6 +9,8 @@
 <path class="st0" d="M95.15,54.37"/>
 <path class="st0" d="M99.11,0"/>
 <path class="st0" d="M19.27,101.7"/>
-<path class="st0" d="M1.03,0c0.57,17.28,17.84,80.47,20,100"/>
-<path class="st0" d="M77.52,100c2.29-19.53,20.6-82.72,21.21-100"/>
+<path class="st0" d="M0,100"/>
+<path class="st0" d="M1.03,0"/>
+<line class="st0" x1="0" y1="0" x2="0" y2="100"/>
+<line class="st0" x1="100" y1="0" x2="100" y2="100"/>
 </svg>

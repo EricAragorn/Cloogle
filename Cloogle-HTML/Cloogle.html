@@ -3,7 +3,7 @@
 <link rel="stylesheet" type="text/css" href="input-box.css">
 
 <div id="header">
-  <div id="title">CLOGO</div>
+  <div id="title">CLOOGLE</div>
   <div id="subtitle">Transform your online experience</div>
 </div>
 <div id="main">
@@ -27,8 +27,10 @@
 
   <div id="input-box" class="fadeOut">
   </div>
+  <div id="bring"><a id="bring-link" href="https://www.google.com">Fill my closets</a></div>
 </div>
 
+<div id="loader"></div>
 <script type="text/javascript">
 
 
@@ -42,19 +44,21 @@ var attributes = {
 };
 
 function changeAttributeDisplay(key, val){
-    alert("key: " + key + " val: " + val);
+    // alert("key: " + key + " val: " + val);
     changeAttribute(key, val);
     mapAttribute();
 }
 
 function changeAttribute(key, val){
   if (attributes[key]==val) return;
-
   attributes[key] = val;
   attributes[key + "_dirty"] = true;
+  var link = "https://www.google.com/search?tbm=isch&q=" + attributes.sleeve + "%20" + attributes.neck + "%20" + attributes.length; 
+  document.getElementById("bring-link").setAttribute("href", link);
 }
 
 function mapAttribute(){
+  
   function disappear(e){
     e.classList.remove("fadeIn") ;
     e.classList.add("fadeOut");
@@ -106,9 +110,15 @@ function mapAttribute(){
       if (attributes.length == "cropLength" 
         || attributes.length == "longLength"
         || attributes.length == "midLength") { // this is a shirt
-        document.getElementById("leg").style.display = "none";
-        document.getElementById("waist").src
-        = "sketch-group/" + attributes.length + ".svg"; 
+        if (attributes.length == "longLength"){
+          document.getElementById("leg").src = "sketch-group/longLength.svg"; 
+          document.getElementById("waist").src = "sketch-group/longLength2.svg";
+        }else{
+          document.getElementById("leg").style.display = "none";
+          document.getElementById("waist").src
+          = "sketch-group/" + attributes.length + ".svg";           
+        }
+
       }else{ // this is a dress
         document.getElementById("leg").style.display = "block";
         document.getElementById("waist").src = "sketch-group/defaultWaist.svg";
@@ -218,7 +228,7 @@ function loadPic(){
   FR.readAsDataURL( pic.files[0] );
  //upload image
   var xhr = new XMLHttpRequest();
-  xhr.open('POST', 'http://localhost:3000/', true);
+  xhr.open('POST', 'http://10.140.253.212:8000/', true);
   xhr.onload = function () {
     if (xhr.status === 200) {
       alert("Uploaded");
@@ -230,11 +240,13 @@ function loadPic(){
     if (xhr.readyState === 4) {
       alert("Receive Feedback");
       console.log(xhr.response);
+      document.getElementById("loader").style.display = "none";
       // setToResponse(JSON.parse(xhr.response));
     }
   }
   var oData = new FormData(document.getElementById("upload-image"));
-  console.log(oData);
+  // console.log(oData);
+  document.getElementById("loader").style.display = "block";
   xhr.send(oData);
 }
 
