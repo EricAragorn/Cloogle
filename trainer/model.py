@@ -4,61 +4,79 @@ import config
 
 
 class res34_v0:
-    def __init__(self):
-        img_dim1, img_dim2, img_dim3 = config.IMG_DIM
-        self.input = tf.placeholder(dtype=tf.float32, shape=(None, img_dim1, img_dim2, img_dim3))
-        self.target = tf.placeholder(dtype=tf.float32, shape=(None, config.LABEL_SIZE))
+    def __init__(self, dataset):
+        img_dim1, img_dim2 = config.IMG_DIM
+        train_x, train_y = dataset.train
+        valid_x, valid_y = dataset.valid
+        test_x, test_y = tf.placeholder(dtype=tf.float32, shape=(None, config.IMG_DIM[0], config.IMG_DIM[1], 3)), \
+                         tf.placeholder(dtype=tf.float32, shape=(None, config.LABEL_SIZE))
+        train_set = tf.data.Dataset.from_tensor_slices((train_x, train_y)) \
+            .batch(config.BATCH_SIZE)
+        valid_set = tf.data.Dataset.from_tensor_slices((valid_x, valid_y)) \
+            .batch(config.BATCH_SIZE)
+        test_set = tf.data.Dataset.from_tensor_slices((test_x, test_y)).batch(1)
+        iter = tf.data.Iterator.from_structure(train_set.output_types, train_set.output_shapes)
+        self.train_init_op = iter.make_initializer(train_set)
+        self.valid_init_op = iter.make_initializer(valid_set)
+        self.test_init_op = iter.make_initializer(test_set)
+        _input, _target = iter.get_next()
+        self.input = _input
+        self.target = _target
         self.is_training = tf.placeholder(dtype=tf.bool, shape=[])
         self.lr = tf.placeholder(dtype=tf.float32, shape=[])
 
         with tf.variable_scope("init_conv"):
             init_conv = tf.layers.conv2d(inputs=self.input,
                                          filters=32,
-                                         kernel_size=(7, 7),
+                                         kernel_size=(3, 3),
                                          activation=tf.nn.leaky_relu)
 
         with tf.variable_scope("res1"):
             pool1 = tf.layers.max_pooling2d(inputs=init_conv, pool_size=(2, 2), strides=(2, 2))
-            conv1 = tf.layers.conv2d(inputs=pool1,
+            dropout1 = tf.layers.dropout(pool1, training=self.is_training)
+            conv1 = tf.layers.conv2d(inputs=dropout1,
                                      kernel_size=(3, 3),
-                                     filters=32)
+                                     filters=16)
             res1 = stacked_res_blocks(inputs=conv1,
                                       kernel_size=config.KERNEL_SIZE,
-                                      filters=32,
+                                      filters=16,
                                       count=2,
                                       is_training=self.is_training)
 
         with tf.variable_scope("res2"):
             pool2 = tf.layers.max_pooling2d(inputs=res1, pool_size=(2, 2), strides=(2, 2))
-            conv2 = tf.layers.conv2d(inputs=pool2,
+            dropout2 = tf.layers.dropout(pool2, training=self.is_training)
+            conv2 = tf.layers.conv2d(inputs=dropout2,
                                      kernel_size=(3, 3),
-                                     filters=64)
+                                     filters=32)
             res2 = stacked_res_blocks(inputs=conv2,
                                       kernel_size=config.KERNEL_SIZE,
-                                      filters=64,
+                                      filters=32,
                                       count=2,
                                       is_training=self.is_training)
 
         with tf.variable_scope("res3"):
             pool3 = tf.layers.max_pooling2d(inputs=res2, pool_size=(2, 2), strides=(2, 2))
-            conv3 = tf.layers.conv2d(inputs=pool3,
+            dropout3 = tf.layers.dropout(pool3, training=self.is_training)
+            conv3 = tf.layers.conv2d(inputs=dropout3,
                                      kernel_size=(3, 3),
-                                     filters=64)
+                                     filters=32)
             res3 = stacked_res_blocks(inputs=conv3,
                                       kernel_size=config.KERNEL_SIZE,
-                                      filters=64,
-                                      count=3,
+                                      filters=32,
+                                      count=2,
                                       is_training=self.is_training)
 
         with tf.variable_scope("res4"):
             pool4 = tf.layers.max_pooling2d(res3, pool_size=(2, 2), strides=(2, 2))
-            conv4 = tf.layers.conv2d(inputs=pool4,
+            dropout4 = tf.layers.dropout(pool4, training=self.is_training)
+            conv4 = tf.layers.conv2d(inputs=dropout4,
                                      kernel_size=(3, 3),
-                                     filters=128)
+                                     filters=64)
             res4 = stacked_res_blocks(inputs=conv4,
                                       kernel_size=config.KERNEL_SIZE,
-                                      filters=128,
-                                      count=3,
+                                      filters=64,
+                                      count=2,
                                       is_training=self.is_training)
 
         global_average_pooling = [tf.reduce_mean(res1, axis=(1, 2)), tf.reduce_mean(res3, axis=(1, 2)),
@@ -67,16 +85,12 @@ class res34_v0:
 
         self.output = tf.layers.dense(feature_vect, config.LABEL_SIZE)
         self.loss = tf.reduce_mean(tf.losses.sigmoid_cross_entropy(self.target, self.output))
-        self.prediction = tf.nn.sigmoid(self.output)
+        tf.summary.scalar("Loss", self.loss)
+        self.prediction = tf.round(tf.nn.sigmoid(self.output))
+        self.accuracy = 1 - tf.reduce_mean(tf.pow(tf.subtract(self.prediction, self.target), 2))
+        tf.summary.scalar("Accuracy", self.accuracy)
         self.train_op = tf.train.AdamOptimizer(learning_rate=self.lr).minimize(self.loss)
-
-    def train(self, sess, image, target):
-        _, loss = sess.run([self.train_op, self.loss], feed_dict={self.input: image, self.target: target})
-        return loss
-
-    def eval(self, sess, image, target):
-        loss = sess.run([self.loss], feed_dict={self.input: image, self.target: target})
-        return loss
+        self.summaries = tf.summary.merge_all()
 
 
 def stacked_res_blocks(inputs, kernel_size, filters, count, is_training, bottleneck_filters=None, type="resblock"):
