@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy as np
-import config
+from trainer import config
 
 
 class res34_v0:
@@ -36,10 +36,10 @@ class res34_v0:
             dropout1 = tf.layers.dropout(pool1, training=self.is_training)
             conv1 = tf.layers.conv2d(inputs=dropout1,
                                      kernel_size=(3, 3),
-                                     filters=16)
+                                     filters=32)
             res1 = stacked_res_blocks(inputs=conv1,
                                       kernel_size=config.KERNEL_SIZE,
-                                      filters=16,
+                                      filters=32,
                                       count=2,
                                       is_training=self.is_training)
 
@@ -48,10 +48,10 @@ class res34_v0:
             dropout2 = tf.layers.dropout(pool2, training=self.is_training)
             conv2 = tf.layers.conv2d(inputs=dropout2,
                                      kernel_size=(3, 3),
-                                     filters=32)
+                                     filters=64)
             res2 = stacked_res_blocks(inputs=conv2,
                                       kernel_size=config.KERNEL_SIZE,
-                                      filters=32,
+                                      filters=64,
                                       count=2,
                                       is_training=self.is_training)
 
@@ -60,10 +60,10 @@ class res34_v0:
             dropout3 = tf.layers.dropout(pool3, training=self.is_training)
             conv3 = tf.layers.conv2d(inputs=dropout3,
                                      kernel_size=(3, 3),
-                                     filters=32)
+                                     filters=64)
             res3 = stacked_res_blocks(inputs=conv3,
                                       kernel_size=config.KERNEL_SIZE,
-                                      filters=32,
+                                      filters=64,
                                       count=2,
                                       is_training=self.is_training)
 
@@ -72,10 +72,10 @@ class res34_v0:
             dropout4 = tf.layers.dropout(pool4, training=self.is_training)
             conv4 = tf.layers.conv2d(inputs=dropout4,
                                      kernel_size=(3, 3),
-                                     filters=64)
+                                     filters=128)
             res4 = stacked_res_blocks(inputs=conv4,
                                       kernel_size=config.KERNEL_SIZE,
-                                      filters=64,
+                                      filters=128,
                                       count=2,
                                       is_training=self.is_training)
 
@@ -116,7 +116,7 @@ def stacked_res_blocks(inputs, kernel_size, filters, count, is_training, bottlen
 
 
 def resBlock(inputs, kernel_size, filters, block_id, is_training, strides=(1, 1), activation=False):
-    with tf.variable_scope(f"ResBlock{block_id}"):
+    with tf.variable_scope("ResBlock{:d}" % block_id):
         bn_ac1 = bn_activation(inputs, is_training)
         conv1 = tf.layers.conv2d(inputs=bn_ac1,
                                  filters=filters,

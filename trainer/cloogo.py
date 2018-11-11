@@ -1,8 +1,8 @@
 import tensorflow as tf
 import numpy as np
-import config
-from data import Dataset
-from model import res34_v0
+from trainer import config
+from trainer.data import Dataset
+from trainer.model import res34_v0
 
 
 def train(TrainedModel = None):
@@ -11,9 +11,9 @@ def train(TrainedModel = None):
 
     print("Start Training...")
     saver = tf.train.Saver()
-    save_path = "saved_models/model_v0.ckpt"
+    save_path = "../saved_models/model_v0.ckpt"
     with tf.Session() as sess:
-        writer = tf.summary.FileWriter("log", sess.graph)
+        writer = tf.summary.FileWriter("../log", sess.graph)
         lr = config.INITIAL_LR
 
         best_valid_accuracy = 0
