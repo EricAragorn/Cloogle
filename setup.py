@@ -1,6 +1,6 @@
 from setuptools import find_packages
 from setuptools import setup
-REQUIRED_PACKAGES = ['pyyaml', 'scikit-learn', 'pandas', 'numpy', 'tensorflow-gpu', 'opencv-python']
+REQUIRED_PACKAGES = ['pyyaml', 'scikit-learn', 'pandas', 'numpy', 'tensorflow-gpu', 'opencv-python', 'matplotlib']
 setup(
     name='cloogo',
     version='0.1',

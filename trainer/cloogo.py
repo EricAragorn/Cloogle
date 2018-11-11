@@ -11,9 +11,15 @@ def train(TrainedModel = None):
 
     print("Start Training...")
     saver = tf.train.Saver()
-    save_path = "../saved_models/model_v0.ckpt"
+    if config.USING_GCP:
+        save_path = "gs://cloogo/saved_models/model_v0.ckpt"
+    else:
+        save_path = "../saved_models/model_v3.ckpt"
     with tf.Session() as sess:
-        writer = tf.summary.FileWriter("../log", sess.graph)
+        if config.USING_GCP:
+            writer = tf.summary.FileWriter("gs://cloogo/log", sess.graph)
+        else:
+            writer = tf.summary.FileWriter("../log/modelv3", sess.graph)
         lr = config.INITIAL_LR
 
         best_valid_accuracy = 0
@@ -43,7 +49,7 @@ def train(TrainedModel = None):
                   .format(epoch + 1, np.mean(train_loss), np.mean(train_accuracy), np.mean(valid_loss), np.mean(valid_accuracy)))
 
             # save model if current valid score is better than the best
-            if np.mean(valid_accuracy) > best_valid_accuracy:
+            if epoch + 1 >= config.START_SAVING and np.mean(valid_accuracy) > best_valid_accuracy:
                 saver.save(sess, save_path)
                 best_valid_accuracy = np.mean(valid_accuracy)
 

@@ -8,7 +8,7 @@ import numpy as np
 
 ssl._create_default_https_context = ssl._create_unverified_context
 
-datadir = "raw_data/dress"
+datadir = "raw_data/top"
 
 def main():
     file_list = os.listdir(datadir)
@@ -37,7 +37,7 @@ def main():
             df["%s" % feature] = df["%s" % feature] > 0
     df = df.astype(int)
 
-    df.to_csv("parsed_data/dress.csv")
+    df.to_csv("parsed_data/top.csv")
 
 def join():
     dress_df = pd.read_csv("parsed_data/dress.csv")
